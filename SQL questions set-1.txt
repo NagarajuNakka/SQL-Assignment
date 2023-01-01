@@ -1,0 +1,1201 @@
+CREATE DATABASE test;
+
+CREATE TABLE city(
+ID int,
+NAME varchar(17),
+COUNTRYCODE varchar(3),
+DISTRICT varchar(20),
+POPULATION bigint);
+    
+	
+	
+	
+INSERT INTO city VALUES(6,'Rotterdam','NLD','Zuid-Holland',593321),(3878,'Scottsdale','USA','Arizona',202705),(3965,'Corona','USA','California',124966),(3973,'Concord','USA','California',121780),(3977,'Cedar Rapids','USA','Iowa',120758),(3982,'Coral Springs','USA','Florida',117549),(4054,'Fairfield','USA','California',92256),(4058,'Boulder','USA','Colorado',91238),(4061,'Fall River','USA','Massachusett',90555);
+
+
+
+
+Q1. Query all columns for all American cities in the CITY table with populations larger than 100000
+
+A.select * from city where population > 100000 and countrycode = 'USA';
+---------------------------------------------------------------------------------------------------
+Q2. Query the NAME field for all American cities in the CITY table with populations larger than 120000
+A.select NAME from city where population > 120000 and countrycode = 'USA';
+------------------------------------------------------------------------------------------------------
+Q3. Query all columns (attributes) for every row in the CITY table.
+A.select * from CITY;
+----------------------------------------------------------------------------------------------------
+Q4. Query all columns for a city in CITY with the ID 1661.
+A.select * from city where id =1661;
+-------------------------------------------------------------------------------------------------
+Q5. Query all attributes of every Japanese city in the CITY table. The COUNTRYCODE for Japan is
+JPN.
+A.select * form city where countrycode='JPN';
+------------------------------------------------------------------------------------------------------
+Q6. Query the names of all the Japanese cities in the CITY table. The COUNTRYCODE for Japan is
+JPN.
+A.A.select * form city where countrycode='JPN';
+---------------------------------------------------------------------------------------------------
+CREATE TABLE STATION(
+ID int,
+CITY varchar(21),
+STATE varchar(2),
+LAT_N int,
+LONG_W int
+);
+
+INSERT INTO STATION VALUES(794,'KisseeMills','MO',139,73),
+(824,'LomaMar','CA',48,130),
+(603,'SandyHook','CT',72,148),
+(478,'Tipton','IN',33,97),
+(619,'Arlington','CO',75,92),
+(711,'Turner','AR',50,101),
+(839,'Slidell','LA',85,151),
+(411,'Negreet','LA',98,105),
+(588,'Glencoe','KY',46,136),
+(665,'Chelsea','IA',98,59),
+(342,'ChignikLagoon','AK',103,153),
+(733,'Pelahatchie','MS',38,28),
+(441,'HannaCity','IL',50,136),
+(811,'Dorrance','KS',102,121),
+(698,'Albany','CA',49,80),
+(325,'Monument','KS',70,141),
+(414,'Manchester','MD',73,37),
+(113,'Prescott','IA',39,65),
+(971,'Graettinger','IA',94,150),
+(266,'Cahone','CO',116,127);
+
+Q7. Query a list of CITY and STATE from the STATION table.
+A.select city,state from station;
+-----------------------------------------------------------------
+Q8. Query a list of CITY names from STATION for cities that have an even ID number. Print the results
+in any order, but exclude duplicates from the answer
+A.select distinct(city) from station where id%2 =0;
+----------------------------------------------------------------------
+Q9. Find the difference between the total number of CITY entries in the table and the number of
+distinct CITY entries in the table.
+A.select count(city)-count(distinct(city)) as distinct_city_entries from station;
+----------------------------------------------------------------------
+Q10. Query the two cities in STATION with the shortest and longest CITY names, as well as their
+respective lengths (i.e.: number of characters in the name). If there is more than one smallest or
+largest city, choose the one that comes first when ordered alphabetically.
+
+A.WITH CTE1 AS(WITH CTE AS(SELECT CITY,RANK()OVER(ORDER BY LENGTH(CITY)) 
+AS RANKN FROM STATION ORDER BY RANKN) SELECT CITY,RANKN,ROW_NUMBER()OVER(PARTITION BY RANKN ORDER BY CITY) AS NEW_RANK FROM CTE) 
+SELECT CITY FROM CTE1 WHERE ( NEW_RANK=1 AND RANKN=(SELECT MAX(RANKN) FROM CTE1)) OR (NEW_RANK=1 AND RANKN=(SELECT MIN(RANKN) FROM CTE1));
+--------------------------------------------------------------------------
+Q11. Query the list of CITY names starting with vowels (i.e., a, e, i, o, or u) from STATION. Your result
+cannot contain duplicates.
+
+
+A.SELECT CITY FROM STATION WHERE SUBSTR(CITY,1,1) IN ('A','E','I','O','U')
+-----------------------------------------------------------------------------------------
+Q13. Query the list of CITY names from STATION that do not start with vowels. Your result cannot
+contain duplicates.
+
+A.SELECT CITY FROM STATION WHERE SUBSTR(CITY,1,1) NOT IN ('A','E','I','O','U');
+---------------------------------------------------------------------------------------------
+Q14. Query the list of CITY names from STATION that do not end with vowels. Your result cannot
+contain duplicates
+
+A.SELECT CITY FROM STATION WHERE RIGHT(CITY,1) NOT IN ('A','E','I','O','U');
+----------------------------------------------------------------------------------------------
+Q15. Query the list of CITY names from STATION that either do not start with vowels or do not end
+with vowels. Your result cannot contain duplicates.
+
+
+A.SELECT CITY FROM STATION WHERE SUBSTR(CITY,1,1) NOT IN ('A','E','I','O','U') OR RIGHT(CITY,1) NOT IN ('A','E','I','O','U');
+--------------------------------------------------------------------------------------------------
+Q16. Query the list of CITY names from STATION that do not start with vowels and do not end with
+vowels. Your result cannot contain duplicates.
+
+A.SELECT CITY FROM STATION WHERE SUBSTR(CITY,1,1) NOT IN ('A','E','I','O','U') OR RIGHT(CITY,1) NOT IN ('A','E','I','O','U');
+-------------------------------------------------------------------------------------------------------
+Q17.
+Create table if not exists product
+(
+    product_id int NOT NULL,
+    product_name VARCHAR(50) NOT NULL,
+    unit_price int,
+	PRIMARY KEY(product_id)
+    
+);
+insert into product values(1,'s8',1000),
+(2,'g4',800),
+(3,'iphone',1400);
+
+Create table if not exists sales
+(
+    seller_id int NOT NULL,
+    product_id int NOT NULL,
+    buyer_id int,
+	sales_date date NOT NULL,
+	quantity int NOT NULL,
+	price int,
+	FOREIGN KEY(product_id) references product(product_id)
+	
+ );
+insert into sales values(1,1,1,'2019-01-21',2,2000),
+(1,2,2,'2019-02-17',1,800),
+(2,2,3,'2019-06-02',1,800),
+(3,3,4,'2019-05-13',2,28000);
+
+--------------------------
+Q18.Write an SQL query that reports the products that were only sold in the first quarter of 2019. That is,
+between 2019-01-01 and 2019-03-31 inclusive.
+
+A.select p.product_name from product p
+join sales s
+on s.product_id=p.product_id
+where s.sales_date  between  '2019-01-01' and '2019-03-31'; 
+--------------------------------------------------------------------------
+
+create table if not exists views(
+article_id int,
+author_id int,
+viewer_id int,
+view_date date
+)
+
+
+
+insert into views values(1,3,5,'2019-08-01'),
+(1,3,6,'2019-08-02'),
+(2,7,7,'2019-08-01'),
+(2,7,6,'2019-08-02'),
+(4,7,1,'2019-07-22'),
+(3,4,4,'2019-07-21'),
+(3,4,4,'2019-07-21')
+
+Q19.Write an SQL query to find all the authors that viewed at least one of their own articles.
+Return the result table sorted by id in ascending order
+
+A.select distinct(author_id) from views where author_id = viewer_id;
+-----------------------------------------------------------------------------------------------
+Q20
+create table if not exists delivery(
+delivery_id int,
+customer_id  int,
+order_date date,
+customer_pref_delivery_date date
+)
+
+insert into delivery values(1,1,'2019-08-01','2019-08-02'),
+(2,5,'2019-08-02','2019-08-02'),
+(3,1,'2019-08-11','2019-08-11'),
+(4,3,'2019-08-24','2019-08-26'),
+(5,4,'2019-08-21','2019-08-22'),
+(6,2,'2019-08-11','2019-08-13')
+
+with cte as(
+select * from(
+SELECT     
+delivery_id,     
+customer_id,     
+order_date,     
+customer_pref_delivery_date,     
+(CASE WHEN order_date = customer_pref_delivery_date THEN 1 ELSE 0 END) as immediate,     
+RANK() OVER(PARTITION BY customer_id ORDER BY order_date) as first_order FROM delivery) as new) 
+SELECT ROUND(SUM(immediate) *100 / COUNT(first_order),2) as immediate_percentage from cte;
+-------------------------------------------------------------------------------------------------------------
+A.Write an SQL query to find the ctr of each Ad. Round ctr to two decimal points.
+Return the result table ordered by ctr in descending order and by ad_id in ascending order in case of a
+tie.
+
+create table if not exists ads(
+ac_id int,
+user_id  int,
+action VARCHAR(20),
+PRIMARY KEY(ac_id,user_id)
+)
+
+
+
+insert into ads values(1,1,'Clicked'),
+(2,2,'Clicked'),
+(3,3,'Viewed'),
+(5,5,'Ignored'),
+(1,7,'Ignored'),
+(2,7,'Viewed'),
+(3,5,'Clicked'),
+(1,4,'Viewed'),
+(2,11,'Viewed'),
+(1,2,'Clicked')
+
+ 
+A.with cte as ( select
+ ac_id,
+ user_id,
+ action,
+RANK() OVER(PARTITION BY ac_id ) as new_action,
+CASE
+ WHEN action = 'clicked' THEN 1 ELSE 0
+END AS new_action_clicked,
+CASE
+ WHEN action = 'Viewed' THEN 1 ELSE 0
+END AS new_action_viewed
+ from ads) 
+ select ac_id, round(sum(new_action_clicked)*100/(sum(new_action_clicked)+sum(new_action_viewed)),2) as ctr from cte group by ac_id;
+----------------------------------------------------------------------------------------------------------------------
+21.Write an SQL query to find the team size of each of the employees.
+Return result table in any order
+
+A.create table if not exists employee(
+employee_id int,
+teamid_id  int,
+PRIMARY KEY(employee_id)
+)
+
+insert into employee values(1,8),
+(2,8),
+(3,8),
+(4,7),
+(5,9),
+(6,9)
+
+SELECT employee_id, COUNT(teamid_id) OVER (PARTITION BY teamid_id) team_size FROM employee;
+--------------------------------------------------------------------------------------------------------------------------
+22.Write an SQL query to find the type of weather in each country for November 2019.
+The type of weather is:
+Cold if the average weather_state is less than or equal 15,
+Hot if the average weather_state is greater than or equal to 25, and
+Warm otherwise
+
+A.create table if not exists countries(
+country_id int,
+country_name varchar(10),
+PRIMARY KEY(country_id)
+)
+insert into countries  values(2,'USA'),
+(3,'Australia'),
+(7,'Peru'),
+(5,'China'),
+(8,'Morocco'),
+(9,'Spain');
+
+create table if not exists weather(
+country_id int,
+weather_state  int,
+day date,
+PRIMARY KEY(country_id,day)
+)
+
+
+insert into weather  values(2,15,'2019-11-01'),
+(2,12,'2019-10-28'),
+(2,12,'2019-10-27'),
+(3,-2,'2019-11-10'),
+(3,0,'2019-11-11'),
+(3,3,'2019-11-12'),
+(5,16,'2019-11-07'),
+(5,18,'2019-11-09'),
+(5,21,'2019-11-23'),
+(7,25,'2019-11-28'),
+(7,22,'2019-12-01'),
+(7,20,'2019-12-02'),
+(8,25,'2019-11-05'),
+(8,27,'2019-11-15'),
+(8,31,'2019-11-25'),
+(9,7,'2019-10-23'),
+(9,3,'2019-12-23');
+
+
+A.
+with cte1 as(with cte as(select c.country_name,c.country_id,w.weather_state,w.day,
+avg(w.weather_state) over(partition by c.country_name) as avg_weather
+from countries as c 
+join weather as w
+on w.country_id = c.country_id where w.day between '2019-11-01' and '2019-11-30')
+
+select 
+distinct(country_name),
+country_id,
+weather_state,
+day,
+avg_weather,
+CASE 
+WHEN avg_weather <= 15 THEN 'COLD' 
+WHEN avg_weather >= 25 THEN 'HOT' ELSE 'WARM'
+END as weather_type
+
+from cte) select distinct(country_name),weather_type from cte1;
+------------------------------------------------------------------------------------------------
+23.Write an SQL query to find the average selling price for each product. average_price should be
+rounded to 2 decimal places.
+
+A.
+create table if not exists prices(
+product_id int,
+start_date date,
+end_date date,
+price int,
+PRIMARY KEY(product_id, start_date, end_date)
+)
+
+
+insert into prices  values(1,'2019-02-17','2019-02-28',5),
+(1,'2019-03-01','2019-03-22',20),
+(2,'2019-02-01','2019-02-20',15),
+(2,'2019-02-21','2019-03-31',30);
+
+ create table if not exists unitsold(
+product_id int,
+purchase_date date,
+units int
+);
+
+insert into unitsold  values(1,'2019-02-25',100),
+(1,'2019-03-01',15),
+(2,'2019-02-10',200),
+(2,'2019-03-22',30);
+
+ with cte as(select p.product_id,u.units,p.price
+ from prices as p
+join unitsold  as u
+ on p.product_id = u.product_id)
+ ,new_flag as(
+ select distinct(product_id),units,price,
+ ROW_NUMBER() OVER(PARTITION BY product_id order by product_id) as ranking
+ from cte
+ group by product_id,units,price)
+ ,new_new_falg as(
+ select 
+ product_id,
+ price,
+ units,
+ ranking,
+ CASE
+ WHEN ranking=1 THEN 'min'
+ WHEN ranking=(select max(ranking) from new_flag) THEN 'max' ELSE 0
+ END as new_rank
+ from new_flag)
+ ,final as(
+ select product_id,units,price,new_rank ,units*price as total_price
+ from new_new_falg where new_rank not in ('min','max'))
+ select 
+ product_id,
+ round(sum(total_price)/ sum(units),2) as  average_price
+ from final group by product_id;
+ -----------------------------------------------------------------
+ 24.Write an SQL query to report the first login date for each player.
+Return the result table in any order
+
+A.
+ create table if not exists activity(
+player_id int,
+device_id int,
+event_date date,
+games_played int,
+PRIMARY KEY(player_id, event_date)
+)
+ 
+ 
+insert into activity values(1,2,'2016-03-01',5),
+(1,2,'2016-05-02',6),
+(2,3,'2017-06-25',1),
+(3,1,'2016-03-02',0),
+(3,4,'2018-07-03',5);
+
+A.select player_id,min(event_date)  from activity group by player_id;
+-------------------------------------------------------------------
+25.
+A.
+with cte as(
+select player_id,
+device_id,
+min(event_date) as event_date
+from activity group by player_id,device_id
+order by event_date)
+, final as(
+select 
+player_id,
+device_id,
+event_date,
+row_number()over(partition by player_id order by event_date) as ranking
+from cte order by event_date)
+select player_id,device_id from final where ranking =1 ;
+----------------------------------------------------------------------
+26.
+ create table if not exists products(
+product_id int,
+product_name varchar(20),
+product_category varchar(20),
+PRIMARY KEY(product_id)
+)
+
+insert into products values(1,'LeetcodeSolutions','Book'),
+(2,'Jewels ofStringology', 'Book'),
+(3,'HP','Laptop'),
+(4,'Lenovo','Laptop'),
+(5,'Leetcode Kit','T-shirt')
+
+ create table if not exists orders(
+product_id int,
+order_date date,
+unit int
+)
+
+
+insert into orders values(1,'2020-02-05',60),
+(1,'2020-02-10',70),
+(2,'2020-01-18',30),
+(2,'2020-02-11',80),
+(3,'2020-02-17',2),
+(3,'2020-02-24',3),
+(4,'2020-03-01',20),
+(4,'2020-03-04',30),
+(4,'2020-03-04',60),
+(5,'2020-02-25',50),
+(5,'2020-02-27',50),
+(5,'2020-03-01',50),
+
+ with cte as(
+select p.product_id,p.product_name,o.unit
+  from products as p  join orders as o on o.product_id=p.product_id 
+ where order_date between '2020-02-01' and'2020-02-28' 
+ group by p.product_id,o.unit,o.order_date)
+select product_name,sum(unit) as unite from cte group by product_name having unite >=100;
+---------------------------------------------------------------------------------------------------------
+27.
+ create table if not exists users(
+user_id int,
+name varchar(30),
+mail varchar(30),
+PRIMARY KEY(user_id)
+)
+
+insert into users values(1,'Winston','winston@leetcode.com'),
+(2,'Jonathan','jonathanisgreat'),
+(3,'Annabelle','bella-@leetcode.com'),
+(4,'Sally','sally.come@leetcode.com'),
+(5,'Marwan','quarz#2020@leetcode.com'),
+(6,'David','david69@gmail.com'),
+(7,'Shapiro','.shapo@leetcode.com')
+
+with cte as(Select user_id,name, mail  , Substring(mail, 1,locate('@', mail)-1) as prefix,
+Substring(mail, locate('@', mail), length(mail)) as  domain
+from users)
+
+select user_id,name,prefix,domain from cte where prefix not like '%#%' and  prefix not like '.%' and domain='@leetcode.com';
+--------------------------------------
+29.
+ create table if not exists tvprogram(
+program_date date,
+content_id int,
+channel varchar(20),
+PRIMARY KEY(program_date, content_id)
+)
+
+
+insert into tvprogram values('2020-06-10 08:00',1,'LC-Channel'),
+('2020-05-11 12:00',2,'LC-Channel'),
+('2020-05-12 12:00',3,'LC-Channel'),
+('2020-05-13 14:00',4,'Disney Ch'),
+('2020-06-18 14:00',4,'Disney Ch'),
+('2020-07-15 16:00',5,'Disney Ch')
+
+ create table if not exists content(
+content_id int,
+title varchar(30),
+kidcontent varchar(30),
+content_type varchar(30),
+PRIMARY KEY(content_id)
+)
+
+insert into content values(1,'Leetcode Movie','N','Movies'),
+(2,'Alg. for Kids','Y','Series'),
+(3,'Database Sols','N','Series'),
+(4,'Aladdin','Y','Movies'),
+(5,'Cinderella','Y','Movies')
+
+ select c.title
+ from content as c
+ join tvprogram as t
+ on c.content_id=t.content_id where kidcontent ='Y' and program_date between '2020-06-01' and '2020-06-30';
+ -------------------------------------------------------------------------------------------------------------
+ 31.
+  create table if not exists npv(
+id int,
+year int,
+npv int,
+PRIMARY KEY(id,year)
+)
+
+insert into npv values(1,2018,100),
+(7,2020,30),
+(13,2019,40),
+(1,2019,113),
+(2,2008,121),
+(3,2009,12),
+(11,2020,99),
+(7,2019,0)
+
+  create table if not exists queries(
+id int,
+year int,
+PRIMARY KEY(id,year)
+)
+
+
+insert into queries values(1,2019),
+(2,2008),
+(3,2009),
+(7,2018),
+(7,2019),
+(7,2020),
+(13,2019)
+
+
+
+
+select q.id, q.year, n.npv
+from queries as q
+left join npv as n
+on (q.id, q.year) = (n.id, n.year)
+------------------------------------------------------------------
+32.
+
+
+  create table if not exists  employees(
+id int,
+name varchar(20),
+PRIMARY KEY(id)
+)
+
+
+insert into employees  values(1,'Alice'),
+(7,'Bob'),
+(11,'Meir'),
+(90,'Winston'),
+(3,'Jonathan')
+
+
+
+  create table if not exists  employeesuni(
+id int,
+unique_id int,
+PRIMARY KEY(id,unique_id)
+);
+
+insert into employeesuni values 
+(3,1),
+(11,2),
+(90,3);
+
+
+select 
+e.unique_id,
+es.name 
+from employeesuni as e 
+right join employees es 
+on es.id =e.id 
+order by es.name;
+-----------------------------------------------
+33.
+  create table if not exists users(
+id int,
+name varchar(20),
+PRIMARY KEY(id)
+)
+
+
+insert into users values(1,'Alice'),
+(2,'Bob'),
+(3,'Alex'),
+(4,'Donald'),
+(7,'Lee'),
+(13,'Jonathan'),
+(19,'Elvis');
+
+  create table if not exists rides(
+id int,
+user_id int,
+distance int,
+PRIMARY KEY(id)
+)
+
+
+insert into rides values(1,1,120),
+(2,2,317),
+(3,3,222),
+(4,7,100),
+(5,13,312),
+(6,19,50),
+(7,7,120),
+(8,19,400),
+(9,7,230);
+
+
+
+select u.name,
+sum(case
+when r.distance is NULL then 0 else r.distance end) as distance_travelled
+from users as u 
+left join rides as r 
+on u.id = r.user_id
+group by u.name
+order by distance_travelled desc,u.name;
+--------------------------------------------------------------------------------
+34.
+  create table if not exists products(
+product_id int,
+product_name varchar(20),
+product_category varchar(20)
+PRIMARY KEY(product_id)
+)
+
+
+
+  create table if not exists orders(
+product_id int,
+order_date date,
+unit int
+PRIMARY KEY(product_id)
+)
+-----------------------------------------------------------------------------
+35.
+
+  create table if not exists movies(
+movie_id int,
+title varchar(20),
+PRIMARY KEY(movie_id)
+)
+
+insert into movies values
+(1,'Avengers'),
+(2 ,'Frozen2'),
+(3 ,'Joker');
+
+
+  create table if not exists user(
+ user_id int,
+name varchar(20),
+PRIMARY KEY(user_id)
+)
+
+insert into user values
+(1,'Daniel'),
+(2,'Monica'),
+(3,'Maria'),
+(4,'James');
+
+
+
+  create table if not exists movierating(
+movie_id int,
+user_id varchar(20),
+rating int,
+create_at date,
+PRIMARY KEY(movie_id,user_id)
+)
+
+
+insert into movierating values
+(1,1,3,'2020-01-12'),
+(1,2,4,'2020-02-11'),
+(1,3,2,'2020-02-12'),
+(1,4,1,'2020-01-01'),
+(2,1,5,'2020-02-17'),
+(2,2,2,'2020-02-01'),
+(2,3,2,'2020-03-01'),
+(3,1,3,'2020-02-22'),
+(3,2,4,'2020-02-25');
+
+
+with cte as( select u.name,count(m.title)
+from movierating as mr
+join user as u 
+on mr.user_id = u.user_id 
+join movies as m 
+on m.movie_id = mr.movie_id
+group by u.name
+limit 1)
+
+,cta as (select m.title as name,avg(mr.rating) as rating
+from movierating as mr
+join user as u 
+on mr.user_id = u.user_id 
+join movies as m 
+on m.movie_id = mr.movie_id
+where mr.create_at between '2020-02-01' and '2020-02-28'
+group by m.title
+order by rating desc
+limit 1)
+select name from cte
+union
+select name from cta;
+------------------------------------------------------------------------------
+36.
+  create table if not exists users(
+id int,
+name varchar(20),
+PRIMARY KEY(id)
+)
+
+
+insert into users values(1,'Alice'),
+(2,'Bob'),
+(3,'Alex'),
+(4,'Donald'),
+(7,'Lee'),
+(13,'Jonathan'),
+(19,'Elvis');
+
+  create table if not exists rides(
+id int,
+user_id int,
+distance int,
+PRIMARY KEY(id)
+)
+
+
+insert into rides values(1,1,120),
+(2,2,317),
+(3,3,222),
+(4,7,100),
+(5,13,312),
+(6,19,50),
+(7,7,120),
+(8,19,400),
+(9,7,230);
+
+
+
+select u.name,
+sum(case
+when r.distance is NULL then 0 else r.distance end) as distance_travelled
+from users as u 
+left join rides as r 
+on u.id = r.user_id
+group by u.name
+order by distance_travelled desc,u.name;
+------------------------------------------------------------------------
+37.
+  create table if not exists  employees(
+id int,
+name varchar(20),
+PRIMARY KEY(id)
+)
+
+
+insert into employees  values(1,'Alice'),
+(7,'Bob'),
+(11,'Meir'),
+(90,'Winston'),
+(3,'Jonathan')
+
+
+
+  create table if not exists  employeesuni(
+id int,
+unique_id int,
+PRIMARY KEY(id,unique_id)
+);
+
+insert into employeesuni values 
+(3,1),
+(11,2),
+(90,3);
+
+
+select 
+e.unique_id,
+es.name 
+from employeesuni as e 
+right join employees es 
+on es.id =e.id 
+order by es.name;
+-------------------------------------------------------------------
+38.
+  create table if not exists  departments(
+id int,
+name varchar(40),
+PRIMARY KEY(id)
+);
+
+
+insert into departments values 
+(1,'Electrical Engineering'),
+(7,'Computer Engineering'),
+(13,'Business Administration');
+
+  create table if not exists students(
+id int,
+name varchar(20),
+department_id int,
+PRIMARY KEY(id)
+);
+
+insert into students values
+(23,'Alice',1),
+(1,'Bob',7),
+(5,'Jennifer',13),
+(2,'John',14),
+(4,'Jasmine',77),
+(3,'Steve',74),
+(6,'Luis',1),
+(8,'Jonathan',7),
+(7,'Daiana',33),
+(11,'Madelynn',1);
+
+select
+ s.id,
+ s.name 
+ from students as s 
+ left join departments as d 
+ on s.department_id=d.id 
+ where d.name is NULL;
+ ---------------------------------------------------------------------------------
+ 39.
+ 
+  create table if not exists calls(
+from_id int,
+to_id int,
+duration int
+);
+
+with cte as(select * from(
+select
+ from_id,to_id,sum(duration),
+ row_number() over() as r1
+ from calls where from_id<to_id 
+ group by to_id,from_id)t1)
+ 
+ select * from cte as t1
+ join 
+ (select * from(select d.c, row_number() over() as r2 from(select count(e.county) as c from(select
+ from_id+to_id  as county
+ from calls ) as e
+ group by e.county) as d ) t2) as t2
+ on t1.r1=t2.r2
+ -------------------------------
+ 
+40.
+
+  create table if not exists prices(
+product_id int,
+start_date date,
+end_date date,
+price int,
+primary key(product_id, start_date, end_date)
+);
+insert into prices values
+(1,'2019-02-17','2019-02-28',5),
+(1,'2019-03-01','2019-03-22',20),
+(2,'2019-02-01','2019-02-20',15),
+(2,'2019-02-21','2019-03-31',30);
+
+  create table if not exists unitsold(
+product_id int,
+purchase_date date,
+units int
+);
+
+insert into unitsold values
+(1,'2019-02-25',100),
+(1,'2019-03-01',15),
+(2,'2019-02-10',200),
+(2,'2019-03-22',30);
+
+
+ with cte as(select p.product_id,u.units,p.price
+ from prices as p
+join unitsold  as u
+ on p.product_id = u.product_id)
+ ,new_flag as(
+ select distinct(product_id),units,price,
+ ROW_NUMBER() OVER(PARTITION BY product_id order by product_id) as ranking
+ from cte
+ group by product_id,units,price)
+ ,new_new_falg as(
+ select 
+ product_id,
+ price,
+ units,
+ ranking,
+ CASE
+ WHEN ranking=1 THEN 'min'
+ WHEN ranking=(select max(ranking) from new_flag) THEN 'max' ELSE 0
+ END as new_rank
+ from new_flag)
+ ,final as(
+ select product_id,units,price,new_rank ,units*price as total_price
+ from new_new_falg where new_rank not in ('min','max'))
+ select 
+ product_id,
+ round(sum(total_price)/ sum(units),2) as  average_price
+ from final group by product_id;
+ --------------------------------------------------------------------------------
+ 
+41.
+create table if not exists warehouse(
+name varchar(30),
+product_id int,
+units int,
+PRIMARY KEY(name,product_id)
+);
+
+insert into warehouse values
+('LCHouse1',1,1),
+('LCHouse1',2,10),
+('LCHouse1',3,5),
+('LCHouse2',1,2),
+('LCHouse2',2,2),
+('LCHouse3',4,1);
+
+
+
+create table if not exists products(
+product_id int,
+product_name varchar(30),
+width int,
+length int,
+height int,
+PRIMARY KEY(product_id)
+);
+
+insert into products values
+(1,'LC-TV',5,50,40),
+(2,'LC-KeyChain',5,5,5),
+(3,'LC-Phone',2,10,10),
+(4,'LC-T-Shirt',4,10,20);
+
+
+
+ select name,sum(volume) from(
+ select p.product_id,w.name,p.length,p.width,p.height,w.units,
+ p.width*p.length*p.height*w.units as volume 
+ from warehouse as w
+ join products as p
+ on w.product_id=p.product_id)
+ as e
+ group by e.name;
+ -------------------------------------------------------------------------
+ 42.
+ 
+create table if not exists sales(
+sales_date date,
+fruit varchar(30),
+sold_num int,
+PRIMARY KEY(sales_date, fruit)
+);
+insert into sales values
+('2020-05-01','apples',10),
+('2020-05-01','oranges',8),
+('2020-05-02','apples',15),
+('2020-05-02','oranges',15),
+('2020-05-03','apples',20),
+('2020-05-03','oranges',0),
+('2020-05-04','apples',15),
+('2020-05-04','oranges',16);
+
+
+with naga as(with cte as(select sales_date as s,max(sold_num) as maxi from sales group by sales_date)
+ select * from cte as t1
+ join
+(select sales_date,min(sold_num) as mini from sales group by sales_date) as t2
+ on t1.s=t2.sales_date order by t1.s)
+ select s,maxi-mini as diff from naga
+ -----------------------------------------------------------------
+ create table if not exists activity(
+ player_id int,
+ device_id int,
+event_date date,
+games_played int,
+PRIMARY KEY(player_id,event_date)
+);
+ 
+insert into activity values
+(1,2,'2016-03-01',5),
+(1,2,'2016-03-02',6),
+(2,3,'2017-06-25',1),
+(3,1,'2016-03-02',0),
+(3,4,'2018-07-03',5);
+
+WITH CTE AS (
+SELECT
+player_id, min(event_date) as event_start_date
+from
+activity
+group by player_id )
+
+SELECT
+round((count(distinct c.player_id) / (select count(distinct player_id) from activity)),2)as fraction
+FROM
+CTE c
+JOIN activity a
+on c.player_id = a.player_id
+and datediff(c.event_start_date, a.event_date) = -1
+---------------------------------------------------------------------------
+44.
+ create table if not exists employee(
+id int,
+name varchar(20),
+department varchar(20),
+manager_id int(20),
+PRIMARY KEY(id)
+);
+
+insert into employee values
+(101,'John','A',null),
+(102,'Dan','A',101),
+(103,'James','A',101),
+(104,'Amy','A',101),
+(105,'Anne','A',101),
+(106,'Ron','B',101);
+
+
+select e.name 
+from employee as e 
+join employee as m 
+on e.id = m.manager_id
+group by e.name
+having count(m.name)=5
+------------------------------------------------------------------------------------
+45.
+
+ create table if not exists student(
+student_id int,
+student_name varchar(20),
+gender varchar(20),
+dept_id int(20),
+PRIMARY KEY(student_id)
+);
+insert into student values
+(1,'Jack','M',1),
+(2,'Jane','F',1),
+(3,'Mark','M',2);
+
+ create table if not exists department(
+dept_id int,
+dept_name varchar(20),
+PRIMARY KEY(dept_id)
+);
+insert into department values
+(1,'Engineering'),
+(2,'Science'),
+(3,'Law');
+
+with cte as (select 
+s.dept_id,
+d.dept_name 
+from student as s 
+right join department as d  
+on s.dept_id=d.dept_id)
+select count(dept_id),dept_name from cte group by dept_name;
+-------------------------------------------------------------------------------
+46.
+ create table if not exists customer(
+customer_id int,
+product_key int
+);
+insert into customer values
+(1,5),
+(2,6),
+(3,5),
+(3,6),
+(1,6);
+
+
+
+ create table if not exists product(
+product_key int,
+PRIMARY KEY(product_key)
+);
+
+insert into product values
+(5),
+(6);
+
+
+with cte as(select count(p.product_key) as county,c.customer_id from customer as c 
+join product as p 
+on c.product_key=p.product_key
+group by c.customer_id)
+
+select customer_id from cte
+where county = 2;
+-----------------------------------------------------
+47.
+create table if not exists project(
+project_id int,
+employee_id int,
+PRIMARY KEY(project_id,employee_id)
+);
+
+insert into project values
+(1,1),
+(1,2),
+(1,3),
+(2,1),
+(2,4);
+
+
+
+
+create table if not exists employee(
+employee_id int,
+name varchar(20),
+experiemce_years int,
+PRIMARY KEY(employee_id)
+);
+
+insert into employee values
+(1,'Khaled',3),
+(2,'Ali',2),
+(3,'John',3),
+(4,'Doe',2);
+
+select project_id,employee_id from(select p.project_id,e.employee_id,
+DENSE_RANK() OVER(PARTITION BY p.project_id ORDER BY e.experiemce_years DESC) as rnk
+ from project as p 
+join employee as e 
+on e.employee_id=p.employee_id) as new
+where rnk =1;
+--------------------------------------------------
+49.
+create table if not exists enrolments(
+student_id int,
+course_id int,
+grade int,
+PRIMARY KEY(student_id, course_id)
+);
+
+
+insert into enrolments values
+(2,2,95),
+(2,3,95),
+(1,1,90),
+(1,2,99),
+(3,1,80),
+(3,2,75),
+(3,3,82);
+
+
+
+
+select student_id,course_id,grade from(select *,
+ROW_NUMBER() OVER(PARTITION BY student_id ORDER BY grade DESC) as rnk
+from enrolments) as new
+where rnk =1;
+----------------------------------------------------------------------------
+50.
+
+select group_id, player_id from (
+	select p.group_id, ps.player_id, sum(ps.score) as score
+	from Players p,
+	    (
+            select first_player as player_id, first_score as score
+            from Matches
+            union all
+            select second_player, second_score
+            from Matches
+	    ) ps
+	where p.player_id = ps.player_id
+	group by ps.player_id
+	order by group_id, score desc, player_id
+	-- limit 1 -- by default, groupby will pick the first one i.e. max score player here
+) top_scores
+group by group_id;
+
+
